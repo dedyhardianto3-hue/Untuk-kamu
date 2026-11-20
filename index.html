@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Untukmu 💌</title>
+<style>
+  :root {
+    --bg: #fde8ec;
+    --bg2: #f9cdd6;
+    --ink: #3a1530;
+    --soft: #8a4a62;
+    --accent: #d93f69;
+    --accent-ink: #ffffff;
+    --card: #fff7f8;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #2a0f23;
+      --bg2: #431a38;
+      --ink: #fde8ec;
+      --soft: #d9a3b6;
+      --accent: #ff6f98;
+      --accent-ink: #2a0f23;
+      --card: #381530;
+      color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: Georgia, "Palatino Linotype", Palatino, serif;
+    color: var(--ink);
+    background: radial-gradient(circle at 50% 0%, var(--bg2), var(--bg) 70%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    overflow-x: hidden;
+  }
+  main {
+    width: 100%;
+    max-width: 440px;
+    text-align: center;
+  }
+  .to {
+    font-style: italic;
+    color: var(--soft);
+    font-size: 1.05rem;
+    margin-bottom: 20px;
+    min-height: 1.4em;
+  }
+  .card {
+    background: var(--card);
+    border-radius: 28px;
+    padding: 36px 26px;
+    min-height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 18px 50px -20px var(--accent);
+    margin-bottom: 28px;
+  }
+  .quote {
+    font-size: 1.45rem;
+    line-height: 1.55;
+    transition: opacity .35s ease, transform .35s ease;
+  }
+  .quote.swap { opacity: 0; transform: translateY(8px); }
+  button {
+    font: inherit;
+    cursor: pointer;
+    border: 0;
+  }
+  .tap {
+    background: var(--accent);
+    color: var(--accent-ink);
+    font-size: 1.15rem;
+    padding: 16px 34px;
+    border-radius: 999px;
+    box-shadow: 0 10px 24px -10px var(--accent);
+    transition: transform .15s ease;
+  }
+  .tap:active { transform: scale(.95); }
+  .copy {
+    display: block;
+    margin: 18px auto 0;
+    background: none;
+    color: var(--soft);
+    font-size: .95rem;
+    text-decoration: underline;
+    padding: 6px;
+  }
+  button:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+  .heart {
+    position: fixed;
+    bottom: -40px;
+    pointer-events: none;
+    animation: float 2.2s ease-out forwards;
+  }
+  @keyframes float {
+    to { transform: translateY(-110vh) rotate(20deg); opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .heart { display: none; }
+    .quote { transition: none; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <p class="to" id="to"></p>
+  <div class="card"><p class="quote" id="quote">Kiki, ada sesuatu yang ingin kusampaikan padamu. Tekan tombol di bawah ini.</p></div>
+  <button class="tap" id="tap">Tekan di sini 💗</button>
+  <button class="copy" id="copy" hidden>Salin kata-kata ini</button>
+</main>
+
+<script>
+  const quotes = [
+    "Di antara semua hal yang kusyukuri, kamu yang paling sering kusebut dalam doa.",
+    "Aku tidak butuh dunia yang sempurna. Cukup ada kamu di dalamnya.",
+    "Hari-hariku biasa saja, sampai kamu datang dan membuat semuanya terasa istimewa.",
+    "Kalau rindu bisa diukur, mungkin sudah sepanjang jarak antara kita dan bintang.",
+    "Senyummu adalah alasan paling sederhana kenapa hariku jadi baik.",
+    "Aku memilihmu hari ini, besok, dan di hari-hari yang belum kita kenal.",
+    "Bersamamu, diam pun terasa seperti obrolan yang paling hangat.",
+    "Kamu bukan sekadar bagian dari hidupku. Kamu alasan aku ingin menjaganya baik-baik.",
+    "Terima kasih sudah menjadi rumah, bahkan saat aku sedang tidak baik-baik saja.",
+    "Jika cinta adalah perjalanan, aku ingin kamu yang duduk di sebelahku sampai akhir.",
+    "Setiap kali namamu muncul di layar, ada yang berdebar di dada ini.",
+    "Aku tidak pandai merangkai kata, tapi hatiku selalu tahu arah pulangnya: kamu.",
+    "Kamu adalah kebetulan paling indah yang pernah kupercayai sebagai takdir.",
+    "Semoga kamu tahu, ada seseorang yang diam-diam bahagia hanya karena kamu ada.",
+    "Rinduku tidak berisik, tapi ia tidak pernah berhenti menyebut namamu.",
+    "Jatuh cinta padamu itu mudah. Yang sulit adalah berhenti memikirkanmu.",
+    "Peluk dari jauh untukmu, sampai nanti aku bisa memelukmu langsung.",
+    "Kamu membuat hal-hal kecil terasa besar, dan hari-hari biasa terasa berharga.",
+    "Jangan lelah ya. Ada aku yang selalu bangga padamu, apa pun hasilnya.",
+    "Kalau suatu hari kamu ragu, ingat: aku jatuh cinta bukan pada kesempurnaanmu, tapi pada kamu.",
+    "Kiki, namamu sederhana, tapi setiap kali kusebut, hatiku terasa hangat.",
+    "Kiki Rizki Wulandari, terima kasih sudah hadir dan membuat hidupku jauh lebih berwarna.",
+    "Kiki, kalau ada satu hal yang ingin kujaga seumur hidup, itu senyummu.",
+    "Rizki, begitu namamu, dan memang kamu adalah rezeki terindah yang pernah datang padaku.",
+    "Wulandari, kamu seperti bulan yang menerangi malam-malamku yang paling gelap.",
+    "Kiki, aku mungkin tidak selalu ada di sampingmu, tapi hatiku selalu pulang padamu.",
+    "Untukmu, Kiki: terima kasih sudah sabar, sudah setia, dan sudah mencintaiku apa adanya.",
+    "Kiki sayang, jangan pernah merasa sendiri. Selalu ada aku yang menyayangimu."
+  ];
+
+  const q = document.getElementById("quote");
+  const tapBtn = document.getElementById("tap");
+  const copyBtn = document.getElementById("copy");
+  const to = document.getElementById("to");
+  let last = -1;
+
+  // Personalisasi lewat link, contoh: ...kata-romantis.html?untuk=Sayang
+  const name = new URLSearchParams(location.search).get("untuk") || "Kiki Rizki Wulandari";
+  to.textContent = "Untuk " + name.slice(0, 40);
+
+  function hearts() {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    for (let i = 0; i < 12; i++) {
+      const h = document.createElement("span");
+      h.className = "heart";
+      h.textContent = ["💗", "💖", "💕", "❤️"][i % 4];
+      h.style.left = Math.random() * 95 + "vw";
+      h.style.fontSize = 16 + Math.random() * 22 + "px";
+      h.style.animationDelay = Math.random() * 0.6 + "s";
+      document.body.appendChild(h);
+      setTimeout(() => h.remove(), 3200);
+    }
+  }
+
+  tapBtn.addEventListener("click", () => {
+    let i;
+    do { i = Math.floor(Math.random() * quotes.length); } while (i === last);
+    last = i;
+    q.classList.add("swap");
+    setTimeout(() => {
+      q.textContent = quotes[i];
+      q.classList.remove("swap");
+    }, 300);
+    tapBtn.textContent = "Satu lagi 💗";
+    copyBtn.hidden = false;
+    copyBtn.textContent = "Salin kata-kata ini";
+    hearts();
+  });
+
+  copyBtn.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(q.textContent);
+      copyBtn.textContent = "Tersalin ✓";
+    } catch (e) {
+      copyBtn.textContent = "Tidak bisa menyalin, tekan lama pada teks";
+    }
+  });
+</script>
+</body>
+</html>
